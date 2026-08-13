@@ -1,6 +1,8 @@
 <?php 
 namespace core\library;
 
+use core\controllers\ErrorController;
+use core\exceptions\ControllerNotFoundException;
 use DI\Container;
 
 class Router
@@ -45,21 +47,25 @@ class Router
         }
 
         if ($this->controller) {
-            return $this->handleController($this->controller, $this->action, $this->parameters);
+            return $this->handleController();
         }
 
         return $this->handleNotFound();
     }
 
-    private function handleController(string $controller, string $action, array $parameters)
+    private function handleController()
     {
-        $controller = $this->container->get($controller);
-        $this->container->call([$controller, $action], [...$parameters]);
+        if (!class_exists($this->controller) || !method_exists($this->controller, $this->action)) {
+            throw new ControllerNotFoundException("[$this->controller::$this->action] not found");
+        }
+
+        $controller = $this->container->get($this->controller);
+        $this->container->call([$controller, $this->action], [...$this->parameters]);
     }
 
     private function handleNotFound()
     {
-        dump('not found controller');
+        (new ErrorController)->notFound();
     }
 
 }

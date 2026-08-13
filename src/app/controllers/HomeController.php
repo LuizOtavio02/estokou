@@ -6,6 +6,6 @@ class HomeController
 {
     public function index()
     {
-        dump('achou');
+        view('home',['title' => 'Home Page']);
     }
 }
