@@ -13,8 +13,17 @@ class LoginController
         ]);
     }
 
-    public function show(Request $request)
+    public function store(Request $request)
     {
-        dd($request);
+        $validated = $request->validate([
+            'email' => 'max:10|required|email',
+            'password' => 'required'
+        ]);
+
+        if ($validated->hasErrors()) {
+            dd($validated->getErrors());
+        }
+
+        dd($validated->data);
     }
 }

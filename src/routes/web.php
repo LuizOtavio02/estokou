@@ -11,5 +11,5 @@ $router = $app->container->get(Router::class);
 $router->add('GET', '/', [HomeController::class, 'index'])->middleware(AuthMiddleware::class);
 $router->add('GET', '/product/([a-z\-]+)', [HomeController::class, 'index']);
 $router->add('GET', '/login', [LoginController::class, 'index']);
-$router->add('POST', '/login', [LoginController::class, 'show']);
+$router->add('POST', '/login', [LoginController::class, 'store']);
 $router->execute();

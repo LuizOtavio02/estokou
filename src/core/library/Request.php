@@ -25,4 +25,33 @@ class Request
             getallheaders()
         );
     }
+
+    public function validate(array $rules): Validate
+    {
+        return (new Validate)->validate($rules, $this);
+    }
+
+    public function get(string $name): ?string
+    {
+        $httpMethod = strtolower($this->server['REQUEST_METHOD']);
+
+        if ($httpMethod) {
+            return strip_tags($this->$httpMethod[$name]);
+        }
+
+        return null;
+    }
+
+    public function all(): array
+    {
+        $httpMethod = strtolower($this->server['REQUEST_METHOD']);
+
+        $data = [];
+
+        foreach ($this->$httpMethod as $key => $value) {
+            $data[$key] = strip_tags($value);
+        }
+
+        return $data;
+    }
 }
