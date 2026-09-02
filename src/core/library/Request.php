@@ -2,25 +2,27 @@
 
 namespace core\library;
 
+use core\library\Session;
+
 class Request
 {
     public function __construct(
         public readonly array $server,
         public readonly array $get,
         public readonly array $post,
-        public readonly array $session,
+        public readonly Session $session,
         public readonly array $cookies,
         public readonly array $headers
     ) {
     }
 
-    public static function create()
+    public static function create(Session $session)
     {
         return new static(
             $_SERVER,
             $_GET,
             $_POST,
-            $_SESSION,
+            $session,
             $_COOKIE,
             getallheaders()
         );

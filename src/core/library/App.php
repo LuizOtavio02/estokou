@@ -9,10 +9,19 @@ use Dotenv\Dotenv;
 class App
 {
     public readonly Container $container;
+    public readonly Session $session;
 
     public static function create()
     {
         return new self;
+    }
+
+    public function withSession()
+    {
+        $this->session = new Session;
+        $this->session->previousUrl();
+        
+        return $this;
     }
 
     public function withEnvironmentVariables()
@@ -31,7 +40,9 @@ class App
     {
         $builder = new ContainerBuilder();
         $builder->addDefinitions([
-            Request::class => Request::create()
+            Request::class => function () {
+                return Request::create($this->session);
+            }
         ]);
         $this->container = $builder->build();
 
