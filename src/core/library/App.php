@@ -2,6 +2,7 @@
 
 namespace core\library;
 
+use core\library\Redirect;
 use DI\Container;
 use DI\ContainerBuilder;
 use Dotenv\Dotenv;
@@ -42,6 +43,9 @@ class App
         $builder->addDefinitions([
             Request::class => function () {
                 return Request::create($this->session);
+            },
+            Redirect::class => function () {
+                return new Redirect($this->session);
             }
         ]);
         $this->container = $builder->build();
