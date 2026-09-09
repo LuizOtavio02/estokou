@@ -3,6 +3,7 @@
 namespace core\library;
 
 use core\library\Redirect;
+use core\library\Session;
 use DI\Container;
 use DI\ContainerBuilder;
 use Dotenv\Dotenv;
@@ -21,7 +22,7 @@ class App
     {
         $this->session = new Session;
         $this->session->previousUrl();
-        
+
         return $this;
     }
 
@@ -46,9 +47,26 @@ class App
             },
             Redirect::class => function () {
                 return new Redirect($this->session);
+            },
+            Session::class => function () {
+                return $this->session;
             }
+
         ]);
         $this->container = $builder->build();
+
+        return $this;
+    }
+
+    public function withServiceContainer()
+    {
+        bind(Redirect::class, function () {
+            return new Redirect($this->session);
+        });
+
+        bind(Session::class, function () {
+            return $this->session;
+        });
 
         return $this;
     }

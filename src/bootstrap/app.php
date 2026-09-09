@@ -8,4 +8,5 @@ require '../core/helpers/functions.php';
 $app = App::create()
     ->withSession()
     ->withEnvironmentVariables()
-    ->withDependencyInjectionContainer();
+    ->withDependencyInjectionContainer()
+    ->withServiceContainer();

@@ -4,8 +4,7 @@ namespace core\library;
 
 class Response
 {
-    public function __construct(private string $content = '', private int $status = 200, private array $headers = []) {
-    }
+    public function __construct(private string $content = '', private int $status = 200, private array $headers = []) {}
 
     public function json(array $data)
     {
@@ -13,6 +12,17 @@ class Response
 
         $this->content = json_encode($data, JSON_PRETTY_PRINT);
 
+        return $this;
+    }
+
+    public function with(array $data, ?Session $session = null)
+    {
+        if ($session) {
+            $session->flash()->set($data);
+            return $this;
+        }
+
+        session()->flash()->set($data);
         return $this;
     }
 
@@ -32,5 +42,4 @@ class Response
 
         echo $this->content;
     }
-
 }

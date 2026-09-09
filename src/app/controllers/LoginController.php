@@ -21,7 +21,8 @@ class LoginController
         ]);
 
         if ($validated->hasErrors()) {
-            dd($validated->getErrors());
+            //dd($validated->getErrors());
+            return back()->with($validated->getErrors());
         }
 
         dd($validated->data);

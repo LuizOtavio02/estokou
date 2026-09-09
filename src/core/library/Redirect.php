@@ -31,6 +31,4 @@ class Redirect
 
         die();
     }
-
-    public function with() {}
 }

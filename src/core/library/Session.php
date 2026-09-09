@@ -53,6 +53,11 @@ class Session
         return $_SESSION;
     }
 
+    public function flash()
+    {
+        return new Flash($this);
+    }
+
     public function previousUrl() 
     {
         if (!$this->has('url')) {
