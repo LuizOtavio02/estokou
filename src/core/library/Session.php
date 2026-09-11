@@ -58,6 +58,11 @@ class Session
         return new Flash($this);
     }
 
+    public function csrf()
+    {
+        return new Csrf($this);
+    }
+
     public function previousUrl() 
     {
         if (!$this->has('url')) {
