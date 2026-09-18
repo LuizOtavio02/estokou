@@ -41,6 +41,11 @@ function csrf(): string
     return session()->csrf()->get();
 }
 
+function method(string $method): string
+{
+    return "<input type='hidden' name='_method' value='{$method}'>";
+}
+
 function configFile(string $key)
 {
     $file = BASE_PATH . '/app/config/config.php';

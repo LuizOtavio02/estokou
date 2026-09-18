@@ -27,8 +27,14 @@ class Router
 
     public function execute()
     {
+        $requestMethod = REQUEST_METHOD;
+
+        if ($this->request->get('_method')) {
+            $requestMethod = strtoupper($this->request->get('_method'));
+        }
+
         foreach ($this->routes as $request => $routes) {
-            if ($request == REQUEST_METHOD) {
+            if ($request == $requestMethod) {
                 return $this->handleUri($routes);
             }
         }
