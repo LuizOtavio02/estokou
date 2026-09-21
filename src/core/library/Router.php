@@ -113,7 +113,11 @@ class Router
 
     private function handleNotFound()
     {
+        $response = ($this->request->ajax()) ? 
+        response(status:404)->json(['error' => 'not found']) :
         (new ErrorController)->notFound();
+
+        $this->handleResponse($response);
     }
 
 }
