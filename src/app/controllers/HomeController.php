@@ -8,8 +8,11 @@ class HomeController
 {
     public function index()
     {
-        $user = User::where('id','>','7');
-        dd($user);
+        $user = new User;
+        $user->firstName = 'Luiz';
+        $user->lastName = 'Otavio';
+        $user->save();
+        
         return view('home',['title' => 'Home Page']);
     }
 }
