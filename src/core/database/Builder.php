@@ -9,6 +9,7 @@ class Builder
 
     private Model $model;
     private string $table;
+    private array $bindings = [];
 
     public static function getInstance(Model $model)
     {
@@ -34,14 +35,30 @@ class Builder
     {
         $attributes = $this->model->attributes();
         if (!array_key_exists('id', $attributes)) {
-            $this->create($attributes);
-            return;
+            return $this->create($attributes);
         }
-        dd('update');
+        $where = ['id' => $attributes['id']];
+        unset($attributes['id']);
+        return $this->update($attributes, $where);
     }
 
     public function where(string $field, string $operator, string $value)
     {
         dd($field, $operator, $value);
+    }
+
+    public function handleStmt(string $sql)
+    {
+        $stmt = Connection::getInstance()->prepare($sql);
+        return $stmt->execute($this->bindings);
+    }
+
+    public function execute(string $sql = '')
+    {
+        if (empty($sql)) {
+            return;
+        }
+        
+        return $this->handleStmt($sql);
     }
 }

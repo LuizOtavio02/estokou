@@ -9,9 +9,7 @@ class HomeController
     public function index()
     {
         $user = new User;
-        $user->firstName = 'Luiz';
-        $user->lastName = 'Otavio';
-        $user->save();
+        $user->delete(['id' => 1]);
         
         return view('home',['title' => 'Home Page']);
     }
