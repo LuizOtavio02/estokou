@@ -9,8 +9,8 @@ class HomeController
     public function index()
     {
         $user = new User;
-        $user->delete(['id' => 1]);
-        
+        $users = $user->select('firstName')->where('id', '>', '1')->first();
+        dd($users);
         return view('home',['title' => 'Home Page']);
     }
 }

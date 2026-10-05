@@ -2,6 +2,8 @@
 
 namespace core\database;
 
+use PDO;
+
 
 class Builder
 {
@@ -10,6 +12,9 @@ class Builder
     private Model $model;
     private string $table;
     private array $bindings = [];
+    private string $select = '*';
+    private array $wheres = [];
+    private string $whereLogicOperator;
 
     public static function getInstance(Model $model)
     {
@@ -42,23 +47,79 @@ class Builder
         return $this->update($attributes, $where);
     }
 
-    public function where(string $field, string $operator, string $value)
+    public function all()
     {
-        dd($field, $operator, $value);
+        $sql = "SELECT * FROM {$this->table}";
+
+        return $this->get($sql);
     }
 
-    public function handleStmt(string $sql)
+    public function select()
     {
-        $stmt = Connection::getInstance()->prepare($sql);
-        return $stmt->execute($this->bindings);
+        $this->select = (func_num_args() === 0) ? '*' : implode(', ',func_get_args());
+        return $this;
     }
 
-    public function execute(string $sql = '')
+    public function and()
+    {
+        $this->whereLogicOperator = 'AND';
+        return $this;
+    }
+
+    public function or()
+    {
+        $this->whereLogicOperator = 'OR';
+        return $this;    
+    }
+
+    public function where(string $field, string $operator, string $value = '')
+    {
+        $where = empty($this->wheres) ? ' WHERE' : $this->whereLogicOperator;
+
+        if (func_num_args() === 2) {
+            $value = $operator;
+            $operator = '=';
+        }
+
+        $this->wheres[] = "{$where} {$field} {$operator} :{$field}";
+
+        $this->bindings = [...$this->bindings,$field => $value];
+
+        return $this;
+    }
+
+    public function get(string $sql = '')
+    {
+        return $this->executeStmt($sql)->fetchAll(PDO::FETCH_CLASS, $this->model::class);
+    }
+
+    public function first(string $sql = '')
+    {
+        return $this->executeStmt($sql)->fetchObject($this->model::class);
+    }
+
+    public function buildQuery()
+    {
+        $sql = "SELECT {$this->select} FROM {$this->table}";
+
+        $sql .= implode(' ', $this->wheres);
+
+        return $sql;
+    }
+
+    public function executeStmt(string $sql = '')
     {
         if (empty($sql)) {
-            return;
+            $sql = $this->buildQuery();
         }
         
-        return $this->handleStmt($sql);
+        return $this->getStmt($sql);
+    }
+
+    public function getStmt(string $sql)
+    {
+        $stmt = Connection::getInstance()->prepare($sql);
+        $stmt->execute($this->bindings);
+        return $stmt;    
     }
 }

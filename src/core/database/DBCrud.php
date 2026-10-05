@@ -18,7 +18,7 @@ trait DBCrud
 
         $sql = "INSERT INTO {$this->table} ({$fields}) VALUES ({$values})";
 
-        return $this->execute($sql);
+        return $this->executeStmt($sql)->rowCount();
     }
 
     public function update(array $data, array $where)
@@ -35,7 +35,7 @@ trait DBCrud
 
         $sql = "UPDATE {$this->table} SET {$fields} WHERE " . implode(' AND ', $where);
 
-        return $this->execute($sql);
+        return $this->executeStmt($sql)->rowCount();
     }
 
     public function delete(array $where)
@@ -48,6 +48,6 @@ trait DBCrud
 
         $sql = "DELETE FROM {$this->table} WHERE " . implode(' AND ', $where);
 
-        return $this->execute($sql);
+        return $this->executeStmt($sql)->rowCount();
     }
 }
