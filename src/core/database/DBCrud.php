@@ -21,8 +21,13 @@ trait DBCrud
         return $this->executeStmt($sql)->rowCount();
     }
 
-    public function update(array $data, array $where)
+    public function update(array $data = [], array $where = [])
     {
+        if (func_num_args() === 0) {
+            $data = $this->model->attributesChanged();
+            $where = ['id' => $this->model->id];
+        }
+
         $this->bindings = [...$data, ...$where];
 
         $fields = implode(',', array_map(function ($field) {
@@ -38,8 +43,11 @@ trait DBCrud
         return $this->executeStmt($sql)->rowCount();
     }
 
-    public function delete(array $where)
+    public function delete(array $where = [])
     {
+        if (empty($where)) {
+            $where = ['id' => $this->model->id];
+        }
         $this->bindings = $where;
         
         $where = array_map(function ($field) {

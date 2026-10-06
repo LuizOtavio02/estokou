@@ -11,10 +11,15 @@ use core\exceptions\BadMethodCallException;
 abstract class Model
 {
     private array $attributes = [];
+    private array $attributesChanged = [];
 
     public function __set(string $name, mixed $value)
     {
-        $this->attributes[$name] = $value;    
+        if (array_key_exists($name, $this->attributes)) {
+            $this->attributesChanged[$name] = $value;
+        } else {
+            $this->attributes[$name] = $value;
+        }
     }
 
     public function __get(string $name)
@@ -25,6 +30,11 @@ abstract class Model
     public function attributes()
     {
         return $this->attributes;
+    }
+
+    public function attributesChanged()
+    {
+        return $this->attributesChanged;
     }
 
     public static function newQueryBuilder(Model $model)

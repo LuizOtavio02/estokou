@@ -15,6 +15,9 @@ class Builder
     private string $select = '*';
     private array $wheres = [];
     private string $whereLogicOperator;
+    private int|string $limit = '';
+    private string $orderBy = '';
+    private string $groupBy = '';
 
     public static function getInstance(Model $model)
     {
@@ -42,9 +45,10 @@ class Builder
         if (!array_key_exists('id', $attributes)) {
             return $this->create($attributes);
         }
+
+        $attributesChanged = $this->model->attributesChanged();
         $where = ['id' => $attributes['id']];
-        unset($attributes['id']);
-        return $this->update($attributes, $where);
+        return $this->update($attributesChanged, $where);
     }
 
     public function all()
@@ -70,6 +74,33 @@ class Builder
     {
         $this->whereLogicOperator = 'OR';
         return $this;    
+    }
+
+    public function groupBy(string $field)
+    {
+        $this->groupBy = " GROUP BY {$field}";
+        return $this;
+    }
+
+    public function orderBy(string $field, string $order = 'ASC')
+    {
+        $this->orderBy = " ORDER BY {$field} {$order}";
+        return $this;
+    }
+
+    public function limit(int|string $limit)
+    {
+        $this->limit = ' LIMIT ' . $limit;
+        return $this;
+    }
+
+    public function find(string $field, mixed $value = '')
+    {
+        if (func_num_args() === 2) {
+            return $this->where($field,$value)->first();
+        }
+
+        return $this->where('id', $field)->first();
     }
 
     public function where(string $field, string $operator, string $value = '')
@@ -103,6 +134,9 @@ class Builder
         $sql = "SELECT {$this->select} FROM {$this->table}";
 
         $sql .= implode(' ', $this->wheres);
+        $sql .= $this->groupBy;
+        $sql .= $this->orderBy;
+        $sql .= $this->limit;
 
         return $sql;
     }
