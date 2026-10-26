@@ -2,6 +2,7 @@
 
 namespace core\database;
 
+use core\library\Paginate;
 use PDO;
 
 
@@ -15,9 +16,11 @@ class Builder
     private string $select = '*';
     private array $wheres = [];
     private string $whereLogicOperator;
+    private int|string $offset = '';
     private int|string $limit = '';
     private string $orderBy = '';
     private string $groupBy = '';
+    private ?Paginate $paginate = null;
 
     public static function getInstance(Model $model)
     {
@@ -88,6 +91,12 @@ class Builder
         return $this;
     }
 
+    public function offset(int $offset)
+    {
+        $this->offset = ' OFFSET ' . $offset;
+        return $this;
+    }
+
     public function limit(int|string $limit)
     {
         $this->limit = ' LIMIT ' . $limit;
@@ -101,6 +110,28 @@ class Builder
         }
 
         return $this->where('id', $field)->first();
+    }
+
+    private function count()
+    {
+        $sql = "SELECT COUNT(*) FROM {$this->table}";
+        $sql .= implode(' ', $this->wheres);
+
+        return $this->executeStmt($sql)->fetchColumn();
+    }
+
+    public function paginate(int $perPage = 10)
+    {
+        $count = $this->count();
+        $this->paginate = new Paginate;
+        $this->paginate->currentPage();
+        $this->paginate->offset($perPage);
+        $this->paginate->totalPages($count);
+
+        $this->limit($perPage);
+        $this->offset($this->paginate->offset);
+
+        return $this->get();
     }
 
     public function where(string $field, string $operator, string $value = '')
@@ -121,6 +152,14 @@ class Builder
 
     public function get(string $sql = '')
     {
+        if ($this->paginate) {
+            $stdClass = new \stdClass;
+            $stdClass->items = $this->executeStmt($sql)->fetchAll(PDO::FETCH_CLASS, $this->model::class);
+            $stdClass->paginate = $this->paginate;
+            $stdClass->total = $this->paginate->total;
+            return $stdClass;
+        }
+
         return $this->executeStmt($sql)->fetchAll(PDO::FETCH_CLASS, $this->model::class);
     }
 
@@ -137,6 +176,8 @@ class Builder
         $sql .= $this->groupBy;
         $sql .= $this->orderBy;
         $sql .= $this->limit;
+        $sql .= $this->offset;
+
 
         return $sql;
     }

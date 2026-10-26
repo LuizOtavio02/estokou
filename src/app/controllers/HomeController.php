@@ -9,14 +9,9 @@ class HomeController
     public function index()
     {
         $user = new User;
-        $users = $user->find(4);
-        $users->firstName = 'Maria';
-        $users->lastName = 'Aparecida';
+        $users = $user->paginate(1);
+
         
-
-        $users->save();
-
-        dd($users);
-        return view('home',['title' => 'Home Page']);
+        return view('home',['title' => 'Home Page', 'users' => $users]);
     }
 }
