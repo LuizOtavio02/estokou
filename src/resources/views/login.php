@@ -4,6 +4,7 @@
 <h2>Login</h2>
 
 <?=  flash('status'); ?>
+<?=  flash('error'); ?>
 
 <form action="/login" method="post">
     <?= csrf() ?>

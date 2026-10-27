@@ -16,6 +16,7 @@
 </head>
 
 <body>
+    <?php $this->insert('partials/header') ?>
     <?= $this->section('content') ?>
 </body>
 

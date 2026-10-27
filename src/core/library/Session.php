@@ -32,6 +32,10 @@ class Session
             return $_SESSION[$key1][$key2];
         }
 
+        if (!$this->has($key)) {
+            return null;
+        }
+
         return $_SESSION[$key];
     }
 

@@ -2,6 +2,8 @@
 
 namespace core\library;
 
+use core\auth\Auth;
+use core\auth\AuthManager;
 use core\library\Redirect;
 use core\library\Session;
 use DI\Container;
@@ -48,6 +50,12 @@ class App
             Redirect::class => function () {
                 return new Redirect($this->session);
             },
+            Auth::class => function () {
+                return Auth::create($this->session);
+            },
+            AuthManager::class => function () {
+                return AuthManager::create($this->session);
+            },
             Session::class => function () {
                 return $this->session;
             }
@@ -66,6 +74,10 @@ class App
 
         bind(Session::class, function () {
             return $this->session;
+        });
+
+        bind(AuthManager::class, function () {
+            return AuthManager::create($this->session);
         });
 
         return $this;

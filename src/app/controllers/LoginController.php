@@ -2,10 +2,13 @@
 
 namespace app\controllers;
 
+use core\auth\Auth;
 use core\library\Request;
 
 class LoginController
 {
+    public function __construct(private Auth $auth) {
+    }
     public function index()
     {
         return view('login', [
@@ -21,10 +24,22 @@ class LoginController
         ]);
 
         if ($validated->hasErrors()) {
-            //dd($validated->getErrors());
-            return back()->with($validated->getErrors());
+            $request->session->flash()->set($validated->getErrors());
+            return back();
         }
 
-        dd($validated->data);
+        if ($this->auth->attempt($request->get('email'), $request->get('password'))) {
+            return redirect('/');
+        }
+
+        $request->session->flash()->set(['error' => 'Invalid credentials']);
+        die();
+    }
+
+    public function destroy()
+    {
+        $this->auth->logout();
+
+        return redirect('/');
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use core\auth\AuthManager;
 use core\library\Container;
 use core\library\Layout;
 use core\library\Redirect;
@@ -44,6 +45,10 @@ function csrf(): string
 function method(string $method): string
 {
     return "<input type='hidden' name='_method' value='{$method}'>";
+}
+
+function auth(){
+    return resolve(AuthManager::class);
 }
 
 function configFile(string $key)

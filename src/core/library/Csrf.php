@@ -16,7 +16,7 @@ class Csrf
         return "<input type='hidden' name='_csrf' value='{$this->session->get('csrf')}'>";
     }
 
-    private function regexIgnoredRoutes(): bool
+    private function routeInList(): bool
     {
         $excepts = configFile('csrf.ignore');
         if (!empty($excepts)) {
@@ -43,7 +43,7 @@ class Csrf
     {
         if (REQUEST_METHOD !== 'GET') {
 
-            if (!$request->get('_csrf') && $this->regexIgnoredRoutes()) {
+            if (!$request->get('_csrf') && $this->routeInList()) {
                 return;
             }
 
@@ -52,10 +52,12 @@ class Csrf
                 die();
             }
 
-            if (!hash_equals($request->get('_csrf'), $this->session->get('csrf'))) {
+            if (!hash_equals($request->get('_csrf'), $this->session->get('csrf') ?? '')) {
                 $this->viewCsrfNotFound($request,'error/419','CSRF token mismatch');
                 die();
             }
+
+            $this->session->remove('csrf');
         }
     }
 }

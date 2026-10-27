@@ -27,6 +27,13 @@ abstract class Model
         return $this->attributes[$name];
     }
 
+    public function removeAttribute(string $name)
+    {
+        if (isset($this->attributes[$name])) {
+            unset($this->attributes[$name]);
+        }
+    }
+
     public function attributes()
     {
         return $this->attributes;
